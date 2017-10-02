@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import res from 'vue-resource'
 import VueNotifications from 'vue-notifications'
+import VueLocalStorage from 'vue-ls';
 
 require('semantic-ui-css/semantic.css')
 
@@ -12,9 +13,10 @@ Vue.config.productionTip = false
 
 Vue.use(res)
 Vue.use(VueNotifications)
+Vue.use(VueLocalStorage);
 
 /* eslint-disable no-new */
-new Vue({
+var app = new Vue({
   el: '#app',
   router,
   template: '<App/>',

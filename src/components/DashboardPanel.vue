@@ -57,7 +57,7 @@
         error: null,
         fieldTDClass: {},
         execution_summary: '',
-        sqlQuery: 'SHOW TABLES'
+        sqlQuery: this.sql
       }
     },
     filters: {
@@ -65,6 +65,7 @@
         return fieldFormatters.hasOwnProperty(column) ? fieldFormatters[column](value) : value
       }
     },
+    props: ['sql'],
     methods: {
       download (format) {
         window.open('/query/sql?disposition=attachment&query=' + encodeURIComponent(this.sqlQuery) + '&format=' + encodeURIComponent(format))

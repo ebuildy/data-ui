@@ -24,7 +24,8 @@
       },
       methods: {
         processSize () {
-          this.editor.setSize('100%', this.$refs.container.parentElement.clientHeight + 'px')
+          //this.editor.setSize('100%', this.$refs.container.parentElement.clientHeight + 'px')
+          this.editor.setSize('100%', '250px')
         }
       },
       mounted () {
