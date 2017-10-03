@@ -39,8 +39,9 @@
 		
 		// processSize
 		this.$nextTick(function () {
-		  this.$refs.main.activateTab(this.tabIndex)
+		  this.$refs.main.navigateToTab(this.tabIndex)
 		  this.$refs.dashboard[this.tabIndex].$refs.editor.processSize()
+		  this.$refs.main.renderTabs()
 		})
 	  },
       name: 'Dashboard',
