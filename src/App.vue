@@ -6,9 +6,9 @@
           <i class="icon diamond"></i>
           dataUI
         </a>
-        <a href="#/" class="item"><i class="icon code"></i> SQL Editor</a>
-        <router-link :to="{name: 'DataSources'}" class="item"><i class="icon database"></i> Data Sources</router-link>
-        <a href="#/about" class="item"><i class="icon talk"></i> About</a>
+        <router-link :to="{path: '/'}" exact class="item" active-class="active"><i class="icon code"></i> SQL Editor</router-link>
+        <router-link :to="{name: 'DataSources'}" class="item" active-class="active"><i class="icon database"></i> Data Sources</router-link>
+        <router-link :to="{path : 'about', exact: true}" class="item" active-class="active"><i class="icon talk"></i> About</router-link>
       </div>
     </header>
     <router-view></router-view>
