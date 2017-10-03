@@ -35,7 +35,7 @@
   import SqlEditor from './SqlEditor.vue'
   import Split from 'split.js'
   import moment from 'moment'
-
+  
   const CSVParser = require('@/services/papaparse').Papa
 
   const numberFormat = new Intl.NumberFormat()
@@ -110,6 +110,8 @@
                 }
               })
             }
+			
+			this.notify('Your results are ready ! '+ this.title, 'Query success')
 
             self.execution_summary = 'Executed in ' + moment.duration(duration).humanize() + ', ' + moment().format('HH:mm MMM Do')
 
@@ -118,6 +120,8 @@
           response => {
             self.execution_summary = ''
 			self.loading = false
+			
+			this.notify('Error in your query - '+ this.title, 'Query error')
 			
             if (response.status === 0) {
               self.error = 'Cannot reach server!'
@@ -128,7 +132,17 @@
               self.error = response.bodyText
             }
           })
-      }
+      },
+	  notify (message, title) {
+		if(('Notification' in window) ){
+			Notification.requestPermission(function(permission){
+  			  var notification = new Notification(title, {body: message,icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Crystal_Clear_app_database.png/64px-Crystal_Clear_app_database.png', dir:'auto'});
+			  setTimeout(function(){
+				notification.close();
+			  }, 4000);
+		    })
+		}	  
+	  }
     },
     mounted ()
     {
