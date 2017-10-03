@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div id="rowEditor">
+        <div class="rowEditor" :id="'rowEditor'+ index">
             <sql-editor ref="editor" v-model="sqlQuery" v-on:execute="execute()"></sql-editor>
         </div>
-        <div id="rowResults" data-sticky-container="true">
+        <div class="rowResults" :id="'rowResults'+ index" data-sticky-container="true">
             <div id="rowActions">
-                <button v-on:click="execute()" class="ui button green"><i class="icon play"></i> Run</button>
+                <button v-on:click="execute()" class="ui button green"><i class="icon play"></i> Run {{ title }}</button>
                 <button v-on:click="download('csv')" class="ui button primary basic"><i class="icon download"></i> Download as CSV</button>
                 <span id="executionSummary">{{ execution_summary }}</span>
             </div>
@@ -65,7 +65,7 @@
         return fieldFormatters.hasOwnProperty(column) ? fieldFormatters[column](value) : value
       }
     },
-    props: ['sql'],
+    props: ['sql', 'index', 'title'],
     methods: {
       download (format) {
         window.open('/query/sql?disposition=attachment&query=' + encodeURIComponent(this.sqlQuery) + '&format=' + encodeURIComponent(format))
@@ -73,7 +73,10 @@
       execute () {
         const self = this
         const startDate = new Date().getTime()
-
+		
+		// emit to model
+		this.$emit('executeSQL', this.sqlQuery)
+		  
         this.loading = true
         this.error = null
         this.execution_summary = 'Executing ..'
@@ -113,8 +116,9 @@
             self.loading = false
           },
           response => {
-            self.loading = false
-
+            self.execution_summary = ''
+			self.loading = false
+			
             if (response.status === 0) {
               self.error = 'Cannot reach server!'
             } else if (response.body && response.body.hasOwnProperty('error')) {
@@ -129,8 +133,8 @@
     mounted ()
     {
       const self = this
-
-      Split(['#rowEditor', '#rowResults'], {
+	  
+      Split(['#rowEditor'+ this.index, '#rowResults'+ this.index], {
         direction: 'vertical',
         gutterSize: 40,
         onDragEnd () {
@@ -167,7 +171,7 @@
         width: 100%;
     }
 
-    #rowEditor
+    .rowEditor
     {
         overflow: hidden;
         position: relative;
@@ -179,7 +183,7 @@
         padding: 5px;
     }
 
-    #rowResults
+    .rowResults
     {
         position: relative;
 
