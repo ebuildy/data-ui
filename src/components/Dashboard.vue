@@ -3,7 +3,7 @@
         <vue-tabs ref="main" v-on:tab-change="handleTabChange">
             <v-tab v-for="(tab, index) in tabs" :title="tab.title">
                 <div slot="title">
-					<a v-if="! tab.change">{{tab.title}}</a>
+					<a v-if="! tab.change" @dblclick.stop="updateTitle(index, true)">{{tab.title}}</a>
 					<div class="ui mini input" v-if="tab.change">
 						<input type="text" ref="title" v-model="_title" @keyup.enter="updateTitle(index, false)" @blur="updateTitle(index, false)" />
 					</div>
