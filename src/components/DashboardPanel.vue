@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="dashboard--panel">
         <div id="rowEditor">
             <sql-editor ref="editor" v-model="sqlQuery" v-on:execute="execute()"></sql-editor>
         </div>
@@ -41,6 +41,8 @@
   const numberFormat = new Intl.NumberFormat()
   const fieldFormatters = {}
 
+  const API_ROOT = 'https://data.datahub.prod.qwant.infra/'
+
   export default {
     components: {
       SqlEditor
@@ -67,7 +69,7 @@
     },
     methods: {
       download (format) {
-        window.open('/query/sql?disposition=attachment&query=' + encodeURIComponent(this.sqlQuery) + '&format=' + encodeURIComponent(format))
+        window.open(API_ROOT + '_query?disposition=attachment&query=' + encodeURIComponent(this.sqlQuery) + '&format=' + encodeURIComponent(format))
       },
       execute () {
         const self = this
@@ -77,7 +79,7 @@
         this.error = null
         this.execution_summary = 'Executing ..'
 
-        this.$http.get('/query/sql?format=csv&limit=500&query=' + encodeURIComponent(this.sqlQuery)).then(response => {
+        this.$http.get(API_ROOT + '_query?format=csv&limit=500&query=' + encodeURIComponent(this.sqlQuery)).then(response => {
             const buffer = CSVParser.parse(response.bodyText, {
               delimiter: ';',
               quoteChar: '"',
@@ -125,10 +127,9 @@
           })
       }
     },
-    mounted ()
-    {
+    mounted () {
       const self = this
-
+      console.log("mounted")
       Split(['#rowEditor', '#rowResults'], {
         direction: 'vertical',
         gutterSize: 40,
@@ -146,9 +147,9 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
-    .ui.main
+    .dashboard--panel
     {
-
+        height: 100%;
     }
 
     #resultsWrapper

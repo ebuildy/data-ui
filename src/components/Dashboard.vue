@@ -44,3 +44,10 @@
       }
     }
 </script>
+
+<style>
+    .vue-tabs, .tab-content, .tab-container
+    {
+        height: 100%;
+    }
+</style>
