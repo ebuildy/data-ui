@@ -1,11 +1,12 @@
 <template>
     <div class="dashboard--panel">
         <div id="rowEditor">
+        <div class="rowEditor" :id="'rowEditor'+ index">
             <sql-editor ref="editor" v-model="sqlQuery" v-on:execute="execute()"></sql-editor>
         </div>
-        <div id="rowResults" data-sticky-container="true">
+        <div class="rowResults" :id="'rowResults'+ index" data-sticky-container="true">
             <div id="rowActions">
-                <button v-on:click="execute()" class="ui button green"><i class="icon play"></i> Run</button>
+                <button v-on:click="execute()" class="ui button green"><i class="icon play"></i> Run {{ title }}</button>
                 <button v-on:click="download('csv')" class="ui button primary basic"><i class="icon download"></i> Download as CSV</button>
                 <span id="executionSummary">{{ execution_summary }}</span>
             </div>
@@ -29,13 +30,14 @@
             </div>
         </div>
     </div>
+    </div>
 </template>
 
 <script>
   import SqlEditor from './SqlEditor.vue'
   import Split from 'split.js'
   import moment from 'moment'
-
+  
   const CSVParser = require('@/services/papaparse').Papa
 
   const numberFormat = new Intl.NumberFormat()
@@ -59,7 +61,7 @@
         error: null,
         fieldTDClass: {},
         execution_summary: '',
-        sqlQuery: 'SHOW TABLES'
+        sqlQuery: this.sql
       }
     },
     filters: {
@@ -67,6 +69,7 @@
         return fieldFormatters.hasOwnProperty(column) ? fieldFormatters[column](value) : value
       }
     },
+    props: ['sql', 'index', 'title'],
     methods: {
       download (format) {
         window.open(API_ROOT + '_query?disposition=attachment&query=' + encodeURIComponent(this.sqlQuery) + '&format=' + encodeURIComponent(format))
@@ -74,7 +77,10 @@
       execute () {
         const self = this
         const startDate = new Date().getTime()
-
+		
+		// emit to model
+		this.$emit('executeSQL', this.sqlQuery)
+		  
         this.loading = true
         this.error = null
         this.execution_summary = 'Executing ..'
@@ -108,14 +114,19 @@
                 }
               })
             }
+			
+			this.notify('Your results are ready ! ' + this.title, 'Query success')
 
             self.execution_summary = 'Executed in ' + moment.duration(duration).humanize() + ', ' + moment().format('HH:mm MMM Do')
 
             self.loading = false
           },
           response => {
-            self.loading = false
-
+            self.execution_summary = ''
+			self.loading = false
+			
+			this.notify('Error in your query - '+ this.title, 'Query error')
+			
             if (response.status === 0) {
               self.error = 'Cannot reach server!'
             } else if (response.body && response.body.hasOwnProperty('error')) {
@@ -125,12 +136,22 @@
               self.error = response.bodyText
             }
           })
-      }
+      },
+	  notify (message, title) {
+		if(('Notification' in window) ){
+			Notification.requestPermission(function(permission){
+  			  var notification = new Notification(title, {body: message,icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Crystal_Clear_app_database.png/64px-Crystal_Clear_app_database.png', dir:'auto'});
+			  setTimeout(function(){
+				notification.close();
+			  }, 4000);
+		    })
+		}	  
+	  }
     },
     mounted () {
       const self = this
-      console.log("mounted")
-      Split(['#rowEditor', '#rowResults'], {
+
+      Split(['#rowEditor' + this.index, '#rowResults' + this.index], {
         direction: 'vertical',
         gutterSize: 40,
         onDragEnd () {
@@ -167,7 +188,7 @@
         width: 100%;
     }
 
-    #rowEditor
+    .rowEditor
     {
         overflow: hidden;
         position: relative;
@@ -179,7 +200,7 @@
         padding: 5px;
     }
 
-    #rowResults
+    .rowResults
     {
         position: relative;
 
